@@ -120,7 +120,6 @@ Tailwind maps this to:
 colors: {
   primary: "var(--proevent-brand)"
 }
-
 ```
 
 Utility classes like `bg-primary` and `text-primary` reflect the saved admin color instantly.
