@@ -24,3 +24,6 @@ wp-content/cache/
 wp-content/upgrade/
 wp-content/debug.log
 
+
+*storybook.log
+storybook-static
