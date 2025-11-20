@@ -1,0 +1,11 @@
+/* tailwind input file; compiled to assets/css/main.css by the CLI */
+/* I usually keep some light custom stuff here too */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* quick sanity defaults */
+.prose a {
+  text-decoration: underline;
+}
