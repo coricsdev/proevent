@@ -629,8 +629,6 @@ function proevent_block_editor_assets() {
 }
 add_action( 'enqueue_block_editor_assets', 'proevent_block_editor_assets' );
 
-
-
 /**
  * render callback for Event Grid block
  */
@@ -907,3 +905,30 @@ function proevent_use_webp_if_available( $image, $attachment_id, $size, $icon ) 
 	return $image;
 }
 add_filter( 'wp_get_attachment_image_src', 'proevent_use_webp_if_available', 10, 4 );
+
+// add Speculation Rules to speed up navigation between event pages / home
+function proevent_output_speculation_rules() {
+
+	// gate: only for real front-end, no admin / login
+	if ( is_admin() || is_user_logged_in() ) {
+		return;
+	}
+	?>
+	<script type="speculationrules">
+	{
+	  "prerender": [
+	    {
+	      "source": "document",
+	      "where": {
+	        "and": [
+	          { "href_matches": "*/event/*" }
+	        ]
+	      },
+	      "eagerness": "moderate"
+	    }
+	  ]
+	}
+	</script>
+	<?php
+}
+add_action( 'wp_head', 'proevent_output_speculation_rules', 30 );
