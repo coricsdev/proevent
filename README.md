@@ -38,36 +38,36 @@ Includes Gutenberg blocks, Tailwind, REST API, and optional dev tooling.
 
 ## Getting Started
 
-- Clone theme
-```
-git clone https://github.com/coricsdev/proevent.git
-cd ProEvent
-```
-> This repo contains only the theme, not full WordPress.
+1. Clone theme
+    ```
+    git clone https://github.com/coricsdev/proevent.git
+    cd ProEvent
+    ```
+    > This repo contains only the theme, not full WordPress.
 
-- Start WordPress via Docker
+2. Start WordPress via Docker
 
-This project includes a minimal Docker setup for local development.
-```
-docker compose up -d
-```
-Open: `http://localhost:8080`
+    This project includes a minimal Docker setup for local development.
+    ```
+    docker compose up -d
+    ```
+    Open: `http://localhost:8080`
 
-Complete WordPress install → Activate ProEvent under Appearance → Themes.
+    Complete WordPress install → Activate ProEvent under Appearance → Themes.
 
-- Install Node packages
+3. Install Node packages
 
-Tailwind + Storybook live here:
-`npm install`
+    Tailwind + Storybook live here:
+    `npm install`
 
-- Tailwind build commands
+4. Tailwind build commands
 
-Regular build:
-`npm run build`
+    Regular build:
+    `npm run build`
 
-Watch mode (during development):
-`npm run watch`
+    Watch mode (during development):
+    `npm run watch`
 
-Source file → `assets/css/tailwind.css`
+    Source file → `assets/css/tailwind.css`
 
-Output file → `assets/css/main.css`
+    Output file → `assets/css/main.css`
