@@ -46,20 +46,28 @@ cd ProEvent
 > This repo contains only the theme, not full WordPress.
 
 - Start WordPress via Docker
+
 This project includes a minimal Docker setup for local development.
 ```
 docker compose up -d
 ```
 Open: `http://localhost:8080`
+
 Complete WordPress install → Activate ProEvent under Appearance → Themes.
 
 - Install Node packages
+
 Tailwind + Storybook live here:
 `npm install`
 
 - Tailwind build commands
+
 Regular build:
 `npm run build`
+
 Watch mode (during development):
 `npm run watch`
 
+Source file → `assets/css/tailwind.css`
+
+Output file → `assets/css/main.css`
