@@ -1,3 +1,4 @@
+// File: wp-content/themes/ProEvent/assets/js/blocks.js
 // very simple, no build step, just using wp.* globals and createElement
 
 (function ( wp ) {
@@ -21,8 +22,9 @@
 	var URLInput = editor.URLInput;
 	var InspectorControls = editor.InspectorControls;
 	var RichText = editor.RichText;
+	var MediaUpload = editor.MediaUpload;
+	var MediaUploadCheck = editor.MediaUploadCheck;
 
-	// small helper to avoid .default fun if something is missing
 	function safeArray( value ) {
 		if ( ! value ) {
 			return [];
@@ -35,6 +37,7 @@
 
 	/* ------------------------------------------------------------------------
 	 * Hero with CTA block
+	 *  - now supports background image + optional dark overlay
 	 * --------------------------------------------------------------------- */
 
 	registerBlockType( 'proevent/hero-cta', {
@@ -47,20 +50,31 @@
 			title: {
 				type: 'string',
 				source: 'html',
-				selector: 'h2',
+				selector: 'h2'
 			},
 			text: {
 				type: 'string',
 				source: 'html',
-				selector: 'p',
+				selector: 'p'
 			},
 			ctaText: {
 				type: 'string',
-				default: '',
+				default: ''
 			},
 			ctaUrl: {
 				type: 'string',
-				default: '',
+				default: ''
+			},
+			bgImageUrl: {
+				type: 'string',
+				default: ''
+			},
+			bgImageId: {
+				type: 'number'
+			},
+			darkOverlay: {
+				type: 'boolean',
+				default: true
 			}
 		},
 
@@ -68,6 +82,81 @@
 
 			var attributes = props.attributes;
 			var setAttributes = props.setAttributes;
+
+			var bgStyle = {};
+			if ( attributes.bgImageUrl ) {
+				bgStyle.backgroundImage = 'url(' + attributes.bgImageUrl + ')';
+			}
+
+			// background controls
+			var bgControls = el(
+				PanelBody,
+				{ title: __( 'Background', 'my-project' ), initialOpen: false },
+
+				el( 'p', { className: 'components-base-control__help' },
+					__( 'Use a background image or leave it as a solid hero.', 'my-project' )
+				),
+
+				el( MediaUploadCheck, {},
+					el( MediaUpload, {
+						onSelect: function ( media ) {
+							if ( ! media ) {
+								return;
+							}
+							setAttributes( {
+								bgImageUrl: media.url || '',
+								bgImageId: media.id || 0
+							} );
+						},
+						allowedTypes: [ 'image' ],
+						value: attributes.bgImageId || 0,
+						render: function ( obj ) {
+							var open = obj.open;
+							return el(
+								'div',
+								null,
+								el(
+									'button',
+									{
+										type: 'button',
+										className: 'components-button is-primary',
+										onClick: open
+									},
+									attributes.bgImageUrl
+										? __( 'Change background image', 'my-project' )
+										: __( 'Select background image', 'my-project' )
+								),
+								attributes.bgImageUrl &&
+								el(
+									'button',
+									{
+										type: 'button',
+										className: 'components-button is-link is-destructive',
+										style: { marginLeft: '6px' },
+										onClick: function () {
+											setAttributes( {
+												bgImageUrl: '',
+												bgImageId: 0
+											} );
+										}
+									},
+									__( 'Remove', 'my-project' )
+								)
+							);
+						}
+					} )
+				),
+
+				attributes.bgImageUrl &&
+				el( components.ToggleControl, {
+					label: __( 'Dark overlay on image', 'my-project' ),
+					help: __( 'Helps text stay readable on busy photos.', 'my-project' ),
+					checked: !! attributes.darkOverlay,
+					onChange: function ( value ) {
+						setAttributes( { darkOverlay: !! value } );
+					}
+				} )
+			);
 
 			var inspector = el(
 				InspectorControls,
@@ -89,7 +178,8 @@
 							setAttributes( { ctaUrl: value } );
 						}
 					} )
-				)
+				),
+				bgControls
 			);
 
 			var heroButton = null;
@@ -98,16 +188,33 @@
 					'a',
 					{
 						href: attributes.ctaUrl || '#',
-						className: 'inline-flex items-center px-5 py-3 rounded-md bg-blue-500 hover:bg-blue-600 text-sm font-semibold'
+						className: 'inline-flex items-center px-5 py-3 rounded-md bg-primary hover:bg-primary/80 text-sm font-semibold'
 					},
 					attributes.ctaText
 				);
 			}
 
-			var block = el(
-				'section',
+			var wrapperClasses = 'proevent-hero-cta relative overflow-hidden rounded-xl px-6 py-10 md:px-10 md:py-16';
+			if ( attributes.bgImageUrl ) {
+				wrapperClasses += ' bg-cover bg-center text-white';
+			} else {
+				wrapperClasses += ' bg-slate-900 text-white';
+			}
+
+			var overlay = null;
+			if ( attributes.bgImageUrl && attributes.darkOverlay ) {
+				overlay = el(
+					'div',
+					{
+						className: 'absolute inset-0 bg-black/60'
+					}
+				);
+			}
+
+			var content = el(
+				'div',
 				{
-					className: 'proevent-hero-cta bg-slate-900 text-white rounded-xl px-6 py-10 md:px-10 md:py-16'
+					className: 'relative max-w-xl'
 				},
 				el( RichText, {
 					tagName: 'h2',
@@ -120,7 +227,7 @@
 				} ),
 				el( RichText, {
 					tagName: 'p',
-					className: 'text-sm md:text-base text-slate-200 mb-6 max-w-xl',
+					className: 'text-sm md:text-base text-slate-200 mb-6',
 					placeholder: __( 'Short supporting text for the hero section.', 'my-project' ),
 					value: attributes.text,
 					onChange: function ( value ) {
@@ -130,6 +237,16 @@
 				heroButton
 			);
 
+			var block = el(
+				'section',
+				{
+					className: wrapperClasses,
+					style: bgStyle
+				},
+				overlay,
+				content
+			);
+
 			return el( wp.element.Fragment, null, inspector, block );
 		},
 
@@ -137,13 +254,35 @@
 
 			var attributes = props.attributes;
 
+			var bgStyle = {};
+			if ( attributes.bgImageUrl ) {
+				bgStyle.backgroundImage = 'url(' + attributes.bgImageUrl + ')';
+			}
+
+			var wrapperClasses = 'proevent-hero-cta relative overflow-hidden rounded-xl px-6 py-10 md:px-10 md:py-16';
+			if ( attributes.bgImageUrl ) {
+				wrapperClasses += ' bg-cover bg-center text-white';
+			} else {
+				wrapperClasses += ' bg-slate-900 text-white';
+			}
+
+			var overlay = null;
+			if ( attributes.bgImageUrl && attributes.darkOverlay ) {
+				overlay = el(
+					'div',
+					{
+						className: 'absolute inset-0 bg-black/60'
+					}
+				);
+			}
+
 			var heroButton = null;
 			if ( attributes.ctaText ) {
 				heroButton = el(
 					'a',
 					{
 						href: attributes.ctaUrl || '#',
-						className: 'inline-flex items-center px-5 py-3 rounded-md bg-blue-500 hover:bg-blue-600 text-sm font-semibold'
+						className: 'inline-flex items-center px-5 py-3 rounded-md bg-primary hover:bg-primary/80 text-sm font-semibold'
 					},
 					attributes.ctaText
 				);
@@ -152,21 +291,27 @@
 			return el(
 				'section',
 				{
-					className: 'proevent-hero-cta bg-slate-900 text-white rounded-xl px-6 py-10 md:px-10 md:py-16'
+					className: wrapperClasses,
+					style: bgStyle
 				},
-				attributes.title &&
-					el( RichText.Content, {
-						tagName: 'h2',
-						className: 'text-3xl md:text-4xl font-bold mb-4',
-						value: attributes.title
-					} ),
-				attributes.text &&
-					el( RichText.Content, {
-						tagName: 'p',
-						className: 'text-sm md:text-base text-slate-200 mb-6 max-w-xl',
-						value: attributes.text
-					} ),
-				heroButton
+				overlay,
+				el(
+					'div',
+					{ className: 'relative max-w-xl' },
+					attributes.title &&
+						el( RichText.Content, {
+							tagName: 'h2',
+							className: 'text-3xl md:text-4xl font-bold mb-4',
+							value: attributes.title
+						} ),
+					attributes.text &&
+						el( RichText.Content, {
+							tagName: 'p',
+							className: 'text-sm md:text-base text-slate-200 mb-6',
+							value: attributes.text
+						} ),
+					heroButton
+				)
 			);
 		}
 
@@ -175,7 +320,7 @@
 
 
 	/* ------------------------------------------------------------------------
-	 * Helper: load event categories from REST
+	 * helper: load event categories from REST
 	 * --------------------------------------------------------------------- */
 
 	function useEventCategories() {
@@ -212,7 +357,7 @@
 			},
 			sort: {
 				type: 'string',
-				default: 'upcoming' // upcoming | recent
+				default: 'upcoming'
 			}
 		},
 
@@ -261,14 +406,8 @@
 						label: __( 'Sorting', 'my-project' ),
 						value: attributes.sort,
 						options: [
-							{
-								label: __( 'Upcoming (soonest first)', 'my-project' ),
-								value: 'upcoming'
-							},
-							{
-								label: __( 'Recent (newest first)', 'my-project' ),
-								value: 'recent'
-							}
+							{ label: __( 'Upcoming (soonest first)', 'my-project' ), value: 'upcoming' },
+							{ label: __( 'Recent (newest first)', 'my-project' ), value: 'recent' }
 						],
 						onChange: function ( value ) {
 							setAttributes( { sort: value } );
@@ -321,8 +460,8 @@
 			return el( wp.element.Fragment, null, inspector, box );
 		},
 
-		// dynamic block → frontend markup comes from PHP render callback
 		save: function () {
+			// dynamic block – markup comes from PHP
 			return null;
 		}
 

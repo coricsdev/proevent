@@ -846,3 +846,64 @@ function proevent_rest_get_next_events( WP_REST_Request $request ) {
 
 	return rest_ensure_response( $data );
 }
+
+// make sure all images rendered via wp_get_attachment_image() lazy load,
+// even if core ever changes its default behaviour.
+function proevent_force_lazyload( $attr, $attachment, $size ) {
+
+	if ( ! empty( $attr['loading'] ) ) {
+		return $attr;
+	}
+
+	$attr['loading'] = 'lazy';
+
+	return $attr;
+}
+add_filter( 'wp_get_attachment_image_attributes', 'proevent_force_lazyload', 10, 3 );
+
+// Prefer .webp if a sibling file exists for the same image
+// e.g. my-image.jpg + my-image.webp → serve the .webp url.
+function proevent_use_webp_if_available( $image, $attachment_id, $size, $icon ) {
+
+	if ( empty( $image ) || ! is_array( $image ) || empty( $image[0] ) ) {
+		return $image;
+	}
+
+	$original_url = $image[0];
+
+	$uploads = wp_get_upload_dir();
+	if ( empty( $uploads['basedir'] ) || empty( $uploads['baseurl'] ) ) {
+		return $image;
+	}
+
+	// only touch urls inside uploads
+	if ( strpos( $original_url, $uploads['baseurl'] ) !== 0 ) {
+		return $image;
+	}
+
+	$relative_path = substr( $original_url, strlen( $uploads['baseurl'] ) );
+	$filepath      = $uploads['basedir'] . $relative_path;
+
+	$info = pathinfo( $filepath );
+	if ( empty( $info['extension'] ) ) {
+		return $image;
+	}
+
+	// already webp, nothing to swap
+	if ( strtolower( $info['extension'] ) === 'webp' ) {
+		return $image;
+	}
+
+	$webp_path = $info['dirname'] . '/' . $info['filename'] . '.webp';
+	if ( ! file_exists( $webp_path ) ) {
+		return $image;
+	}
+
+	$webp_relative = str_replace( $uploads['basedir'], '', $webp_path );
+	$webp_url      = trailingslashit( $uploads['baseurl'] ) . ltrim( $webp_relative, '/' );
+
+	$image[0] = $webp_url;
+
+	return $image;
+}
+add_filter( 'wp_get_attachment_image_src', 'proevent_use_webp_if_available', 10, 4 );
