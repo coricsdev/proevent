@@ -71,3 +71,66 @@ Includes Gutenberg blocks, Tailwind, REST API, and optional dev tooling.
     Source file → `assets/css/tailwind.css`
 
     Output file → `assets/css/main.css`
+
+    Note: `main.css` is ignored in git, it’s generated.
+
+---
+
+## Architectural Decisions
+
+### Only theme-level logic ###
+
+No external plugins or frameworks.
+Gutenberg blocks use WP’s global React runtime — no JSX, no Webpack.
+
+### Dynamic brand color (CSS variable) ###
+
+The Company Settings page stores a brand color.
+The theme injects:
+```
+:root {
+  --proevent-brand: #xxxxxx;
+}
+```
+
+Tailwind maps this to:
+```
+colors: {
+  primary: "var(--proevent-brand)"
+}
+
+```
+
+Utility classes like `bg-primary` and `text-primary` reflect the saved admin color instantly.
+
+
+### WebP image preference ###
+
+The theme swaps WordPress image URLs to `.webp ` when a sibling exists:
+
+```
+my-photo.jpg  
+my-photo.webp  ← served instead
+```
+
+Uploads work exactly the same — just upload WebP for the best results.
+
+### Lazy-loading everywhere ###
+
+Images rendered via:
+
+- `the_post_thumbnail()`
+- `wp_get_attachment_image()`
+- get `loading="lazy"` forced via a filter.
+
+
+### Gutenberg blocks written without a build step ###
+
+Blocks are written in plain JS via:
+
+- `wp.blocks`
+- `wp.element.createElement`
+- `wp.blockEditor`
+- `wp.components`
+
+This keeps the theme zero-build and keeps all block logic editable inside `assets/js/blocks.js`
