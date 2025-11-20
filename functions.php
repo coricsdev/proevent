@@ -585,7 +585,7 @@ function proevent_register_blocks() {
 			'attributes'      => array(
 				'limit'    => array(
 					'type'    => 'number',
-					'default' => 6,
+					'default' => 5,
 				),
 				'category' => array(
 					'type'    => 'string',
@@ -636,7 +636,7 @@ add_action( 'enqueue_block_editor_assets', 'proevent_block_editor_assets' );
  */
 function proevent_render_event_grid_block( $attributes, $content ) {
 
-	$limit    = isset( $attributes['limit'] ) && (int) $attributes['limit'] > 0 ? (int) $attributes['limit'] : 6;
+	$limit    = isset( $attributes['limit'] ) && (int) $attributes['limit'] > 0 ? (int) $attributes['limit'] : 5;
 	$category = isset( $attributes['category'] ) ? sanitize_text_field( $attributes['category'] ) : '';
 	$sort     = ! empty( $attributes['sort'] ) ? $attributes['sort'] : 'upcoming';
 
