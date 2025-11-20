@@ -1,16 +1,15 @@
-/* minimal tailwind config, just enough to keep purge working correctly */
-
 module.exports = {
-    content: [
-      "./*.php",
+  content: [
       "./**/*.php",
-      "./assets/js/**/*.js"
-    ],
-    theme: {
+      "./assets/js/**/*.js",
+      "./assets/css/**/*.css"
+  ],
+  theme: {
       extend: {
-        // we’ll probably wire brand color from settings later
+          colors: {
+              primary: "var(--proevent-brand)",   // our dynamic theme color
+          }
       }
-    },
-    plugins: []
-  };
-  
+  },
+  plugins: []
+}

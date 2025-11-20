@@ -1,9 +1,10 @@
 <?php
-// basic static page template (About, Contact, etc.). we’ll customize per-page later if needed.
+// File: wp-content/themes/ProEvent/page.php
+
 get_header();
 ?>
 
-<div class="max-w-3xl mx-auto px-4 py-10">
+<div class="proevent-page max-w-3xl">
 
 	<?php
 	if ( have_posts() ) :
@@ -11,7 +12,11 @@ get_header();
 			the_post();
 			?>
 			<article <?php post_class(); ?>>
-				<h1 class="text-3xl font-bold mb-6"><?php the_title(); ?></h1>
+				<h1 class="proevent-page-title mb-4"><?php the_title(); ?></h1>
+
+				<div class="proevent-page-subtitle mb-6">
+					<?php // could add breadcrumbs or intro later ?>
+				</div>
 
 				<div class="prose max-w-none">
 					<?php the_content(); ?>

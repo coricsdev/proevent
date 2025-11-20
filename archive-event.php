@@ -3,14 +3,9 @@
 
 get_header();
 
-// this archive is basically the "all events" view,
-// but we’ll bias it toward upcoming ones using meta query.
 $paged = max( 1, get_query_var( 'paged' ) );
-
 $today = current_time( 'Y-m-d' );
 
-// overwrite main query only on event archive
-// (using pre_get_posts would be cleaner, but doing it inline for clarity here)
 $args = array(
 	'post_type'      => 'event',
 	'posts_per_page' => 12,
@@ -29,18 +24,17 @@ $args = array(
 );
 
 $query = new WP_Query( $args );
-
 ?>
-<div class="max-w-6xl mx-auto px-4 py-10">
+<div class="proevent-page">
 
 	<header class="mb-8">
-		<h1 class="text-3xl font-bold mb-2">
+		<h1 class="proevent-page-title">
 			<?php
-			$post_type_obj = get_post_type_object( 'event' );
-			echo $post_type_obj ? esc_html( $post_type_obj->labels->name ) : esc_html__( 'Events', 'my-project' );
+			$pto = get_post_type_object( 'event' );
+			echo $pto ? esc_html( $pto->labels->name ) : esc_html__( 'Events', 'my-project' );
 			?>
 		</h1>
-		<p class="text-slate-600 text-sm">
+		<p class="proevent-page-subtitle">
 			<?php esc_html_e( 'Browse upcoming events.', 'my-project' ); ?>
 		</p>
 	</header>
@@ -62,52 +56,52 @@ $query = new WP_Query( $args );
 					$formatted_date = $ts ? date_i18n( get_option( 'date_format' ), $ts ) : $event_date;
 				}
 				?>
-				<article <?php post_class( 'bg-white rounded-lg shadow-sm overflow-hidden flex flex-col' ); ?>>
+				<article <?php post_class( 'proevent-card' ); ?>>
 
 					<?php if ( has_post_thumbnail() ) : ?>
-						<div class="h-40 overflow-hidden">
+						<div class="proevent-card-media">
 							<?php
 							the_post_thumbnail(
 								'medium_large',
 								array(
 									'loading' => 'lazy',
-									'class'   => 'w-full h-full object-cover',
 								)
 							);
 							?>
 						</div>
 					<?php endif; ?>
 
-					<div class="p-4 flex flex-col flex-1">
+					<div class="proevent-card-body">
 
-						<?php if ( $formatted_date ) : ?>
-							<div class="text-xs font-semibold text-blue-700 mb-1">
-								<?php echo esc_html( $formatted_date ); ?>
+						<?php if ( $formatted_date || $event_time ) : ?>
+							<div class="proevent-meta-row">
+								<?php if ( $formatted_date ) : ?>
+									<span><?php echo esc_html( $formatted_date ); ?></span>
+								<?php endif; ?>
 								<?php if ( $event_time ) : ?>
-									<span class="text-slate-500">&middot; <?php echo esc_html( $event_time ); ?></span>
+									<span>&middot; <?php echo esc_html( $event_time ); ?></span>
 								<?php endif; ?>
 							</div>
 						<?php endif; ?>
 
-						<h2 class="text-lg font-semibold mb-2">
+						<h2 class="proevent-card-title">
 							<a href="<?php the_permalink(); ?>" class="hover:underline">
 								<?php the_title(); ?>
 							</a>
 						</h2>
 
 						<?php if ( $location ) : ?>
-							<div class="text-xs text-slate-600 mb-3">
+							<div class="proevent-location">
 								<?php echo esc_html( $location ); ?>
 							</div>
 						<?php endif; ?>
 
-						<div class="text-sm text-slate-700 mb-4 flex-1">
+						<div class="proevent-card-excerpt">
 							<?php echo wp_kses_post( wp_trim_words( get_the_excerpt(), 25 ) ); ?>
 						</div>
 
 						<div class="mt-auto pt-2">
-							<a href="<?php the_permalink(); ?>"
-							   class="inline-flex items-center text-sm font-semibold text-blue-700 hover:text-blue-900">
+							<a href="<?php the_permalink(); ?>" class="proevent-link">
 								<?php esc_html_e( 'View details', 'my-project' ); ?>
 								<span class="ml-1">&rarr;</span>
 							</a>
@@ -123,7 +117,6 @@ $query = new WP_Query( $args );
 
 		<div class="mt-10">
 			<?php
-			// simple pagination using core function
 			echo paginate_links(
 				array(
 					'total'   => $query->max_num_pages,
@@ -135,12 +128,13 @@ $query = new WP_Query( $args );
 
 	<?php else : ?>
 
-		<p><?php esc_html_e( 'No upcoming events found.', 'my-project' ); ?></p>
+		<p class="text-sm text-slate-500">
+			<?php esc_html_e( 'No upcoming events found.', 'my-project' ); ?>
+		</p>
 
 	<?php endif; ?>
 
 </div>
-
 <?php
 wp_reset_postdata();
 

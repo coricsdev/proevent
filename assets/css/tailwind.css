@@ -1,11 +1,120 @@
+/* File: wp-content/themes/ProEvent/assets/css/tailwind.css */
+
 /* tailwind input file; compiled to assets/css/main.css by the CLI */
-/* I usually keep some light custom stuff here too */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* quick sanity defaults */
+
+/* ------------------------------------------------------------------
+ * Small "design system" on top of tailwind
+ * nothing fancy, just some reusable bits so templates don't look naked
+ * ------------------------------------------------------------------ */
+
+@layer components {
+
+  .proevent-shell {
+    @apply max-w-6xl mx-auto px-4;
+  }
+
+  .proevent-page {
+    @apply proevent-shell py-8 md:py-12;
+  }
+
+  .proevent-page-title {
+    @apply text-3xl md:text-4xl font-bold tracking-tight mb-2;
+  }
+
+  .proevent-page-subtitle {
+    @apply text-sm md:text-base text-slate-600 mb-6;
+  }
+
+  .proevent-card {
+    @apply bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden flex flex-col;
+  }
+
+  .proevent-card-media {
+    @apply h-40 md:h-44 overflow-hidden;
+  }
+
+  .proevent-card-media img {
+    @apply w-full h-full object-cover;
+  }
+
+  .proevent-card-body {
+    @apply p-4 md:p-5 flex flex-col flex-1;
+  }
+
+  .proevent-meta-row {
+    @apply text-xs font-medium text-slate-500 mb-2 flex flex-wrap gap-x-2 gap-y-1;
+  }
+
+  .proevent-location {
+    @apply text-xs text-slate-600 mb-2;
+  }
+
+  .proevent-card-title {
+    @apply text-base md:text-lg font-semibold mb-1;
+  }
+
+  .proevent-card-excerpt {
+    @apply text-sm text-slate-700 mb-4 flex-1;
+  }
+
+  .proevent-link {
+    @apply inline-flex items-center text-sm font-semibold text-blue-700 hover:text-blue-900;
+  }
+
+  .proevent-tag {
+    @apply inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700;
+  }
+
+  .proevent-btn-primary {
+    @apply inline-flex items-center justify-center px-5 py-3 rounded-md text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700;
+  }
+
+  .proevent-header-nav {
+    @apply text-sm hidden md:flex gap-4;
+  }
+
+  .proevent-header-nav--mobile {
+    @apply md:hidden;
+  }
+
+  .proevent-footer {
+    @apply border-t border-slate-200 mt-10;
+  }
+
+  .proevent-footer-inner {
+    @apply proevent-shell py-6 text-xs md:text-sm text-slate-500 flex flex-col md:flex-row md:items-center justify-between gap-4;
+  }
+
+  .proevent-footer-social {
+    @apply flex items-center gap-2 flex-wrap;
+  }
+
+  .proevent-footer-menu {
+    @apply flex flex-wrap gap-3;
+  }
+}
+
+
+/* small prose tweaks */
 .prose a {
   text-decoration: underline;
 }
+
+@layer utilities {
+  .btn-primary {
+      background-color: var(--proevent-brand);
+      color:#fff;
+      padding: .65rem 1.25rem;
+      border-radius: .5rem;
+      font-weight: 600;
+  }
+  .btn-primary:hover {
+      background-color: color-mix(in srgb, var(--proevent-brand) 85%, #000);
+  }
+}
+

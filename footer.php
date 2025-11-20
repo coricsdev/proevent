@@ -8,7 +8,6 @@ if ( function_exists( 'proevent_company_get_settings' ) ) {
 
 $brand_color = ! empty( $company_settings['brand_color'] ) ? $company_settings['brand_color'] : '#2563eb';
 
-// quick social detection
 $social_links = array(
 	'facebook'  => array(
 		'label' => __( 'Facebook', 'my-project' ),
@@ -29,30 +28,29 @@ $social_links = array(
 );
 
 $has_social = false;
-foreach ( $social_links as $s ) {
-	if ( ! empty( $s['url'] ) ) {
+foreach ( $social_links as $item ) {
+	if ( ! empty( $item['url'] ) ) {
 		$has_social = true;
 		break;
 	}
 }
-
 ?>
 </main>
 
-<footer class="border-t border-slate-200 mt-10">
-	<div class="max-w-6xl mx-auto px-4 py-6 text-sm text-slate-500 flex justify-between gap-4 flex-wrap">
+<footer class="proevent-footer bg-white/90">
+	<div class="proevent-footer-inner">
 
-		<div>
+		<div class="order-2 md:order-1">
 			&copy; <?php echo esc_html( date_i18n( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>
 		</div>
 
 		<?php if ( $has_social ) : ?>
-			<div class="flex items-center gap-3 flex-wrap">
-				<span class="text-xs text-slate-500">
-					<?php esc_html_e( 'Follow us:', 'my-project' ); ?>
+			<div class="proevent-footer-social order-1 md:order-2">
+				<span class="text-[11px] uppercase tracking-wide text-slate-400">
+					<?php esc_html_e( 'Follow us', 'my-project' ); ?>
 				</span>
 
-				<?php foreach ( $social_links as $key => $social ) : ?>
+				<?php foreach ( $social_links as $social ) : ?>
 					<?php if ( empty( $social['url'] ) ) : continue; endif; ?>
 					<a
 						href="<?php echo esc_url( $social['url'] ); ?>"
@@ -67,18 +65,19 @@ foreach ( $social_links as $s ) {
 			</div>
 		<?php endif; ?>
 
-		<nav>
+		<nav class="order-3">
 			<?php
 			wp_nav_menu(
 				array(
 					'theme_location' => 'footer',
 					'container'      => false,
-					'menu_class'     => 'flex gap-3',
+					'menu_class'     => 'proevent-footer-menu',
 					'fallback_cb'    => false,
 				)
 			);
 			?>
 		</nav>
+
 	</div>
 </footer>
 

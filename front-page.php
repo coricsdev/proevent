@@ -1,20 +1,18 @@
 <?php
 // File: wp-content/themes/ProEvent/front-page.php
 
-// front page is now fully block-driven (Hero + Event Grid etc.)
+// now block-driven; just need a nice wrapper
 get_header();
 ?>
 
-<div class="max-w-6xl mx-auto px-4 py-10">
+<div class="proevent-page">
+
 	<?php
 	if ( have_posts() ) :
 
 		while ( have_posts() ) :
 			the_post();
-
-			// just render blocks/content, no custom query here
 			the_content();
-
 		endwhile;
 
 	else :
@@ -25,6 +23,7 @@ get_header();
 		<?php
 	endif;
 	?>
+
 </div>
 
 <?php
